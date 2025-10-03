@@ -7,6 +7,7 @@ from telethon.tl.custom import Button
 from telethon.tl.types import BotCommand
 
 from configparser import ConfigParser
+from DataBase import DataBase
 
 # -----------------------SETTINGS-----------------------
 config = ConfigParser()
@@ -19,6 +20,8 @@ admins = [5721277663, 1952338586]
 
 bot = TelegramClient("bot", api_id=API_ID, api_hash=API_HASH).start(bot_token=BOT_TOKEN)
 
+db = DataBase("music_gp.db")
+db.init_db()
 
 # -----------------------EVENTS------------------------
 
@@ -26,13 +29,27 @@ bot = TelegramClient("bot", api_id=API_ID, api_hash=API_HASH).start(bot_token=BO
 async def new_message(event):
     user = await event.get_sender()
     if event.is_group and is_admin(user.id):
-        await event.reply("Bot is Activate ✔️")
+        await event.reply("Bot is Activate ✅")
         return
     if not is_admin(user.id):
         await event.respond("Hey there👋\n\n⚠️ Sorry, your account has not defined to chat with this bot."
                             "\n\n📞 Please contact with owner : @lzruenal")
         return
     await event.respond(f"Welcome {user.first_name} 👋\n\nHave good day🌞", buttons=home_menu())
+
+
+@bot.on(events.CallbackQuery(pattern=b"btn_.*"))
+async def callback_handler(event: events.CallbackQuery.Event):
+    data = event.data.decode().split("_")[1]
+
+    if data == "createlist":
+        pass
+    elif data == "showlist":
+        pass
+    elif data == "aboutus":
+        await event.answer("My name is Mehran Fallah and creator of this bot")
+    elif data == "help":
+        await event.answer("There is nothing to help")
 
 
 # -----------------------FUNCTIONS---------------------
@@ -46,7 +63,7 @@ def is_admin(user_id: int) -> bool:
 def home_menu():
     keyboard = [
         [
-            Button.inline("🎶 تهیه لیست موسیقی هفته 🎶", data="btn_music")
+            Button.inline("🎶 تهیه لیست موسیقی هفته 🎶", data="btn_createlist")
         ],
         [
             Button.inline("🔆 نمایش لیست موسیقی هفته 🔆", data="btn_showlist")
