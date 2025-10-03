@@ -2,11 +2,12 @@
 This is main
 """
 # -----------------------LIBRARIES-----------------------
+from configparser import ConfigParser
+
 from telethon import TelegramClient, events, types, functions
 from telethon.tl.custom import Button
 from telethon.tl.types import BotCommand
 
-from configparser import ConfigParser
 from DataBase import DataBase
 
 # -----------------------SETTINGS-----------------------
@@ -20,8 +21,10 @@ admins = [5721277663, 1952338586]
 
 bot = TelegramClient("bot", api_id=API_ID, api_hash=API_HASH).start(bot_token=BOT_TOKEN)
 
+# Setup Database
 db = DataBase("music_gp.db")
 db.init_db()
+
 
 # -----------------------EVENTS------------------------
 
@@ -32,10 +35,15 @@ async def new_message(event):
         await event.reply("Bot is Activate ✅")
         return
     if not is_admin(user.id):
-        await event.respond("Hey there👋\n\n⚠️ Sorry, your account has not defined to chat with this bot."
-                            "\n\n📞 Please contact with owner : @lzruenal")
+        await event.respond(
+            "Hey there👋\n\n⚠️ Sorry, your account has not defined to chat with this bot."
+            "\n\n📞 Please contact with owner : @lzruenal"
+        )
         return
-    await event.respond(f"Welcome {user.first_name} 👋\n\nHave good day🌞", buttons=home_menu())
+    await event.respond(
+        f"Welcome {user.first_name} 👋\n\nHave good day😄"
+        f"\n\nWhat you plan to do ?", buttons=home_menu()
+    )
 
 
 @bot.on(events.CallbackQuery(pattern=b"btn_.*"))
@@ -66,7 +74,7 @@ def home_menu():
             Button.inline("🎶 تهیه لیست موسیقی هفته 🎶", data="btn_createlist")
         ],
         [
-            Button.inline("🔆 نمایش لیست موسیقی هفته 🔆", data="btn_showlist")
+            Button.inline("🔹 نمایش لیست موسیقی هفته 🔹", data="btn_showlist")
         ],
         [
             Button.inline("📢 راهنما", data="btn_help"),
