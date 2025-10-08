@@ -1,5 +1,4 @@
 import sqlite3
-import datetime
 
 
 class DataBase:
@@ -29,6 +28,18 @@ class DataBase:
         with sqlite3.connect(self.path) as conn:
             cur = conn.cursor()
             cur.execute('''SELECT * FROM playlists''')
+            return cur.fetchall()
+
+    def get_list_of_week(self, week):
+        # Validtion for week input.
+        try:
+            week_int = int(week)
+        except (ValueError, TypeError):
+            raise ValueError("The week must be integer")
+
+        with sqlite3.connect(self.path) as conn:
+            cur = conn.cursor()
+            cur.execute('''SELECT * FROM playlists WHERE weekid= ? ''', (week_int,))
             return cur.fetchall()
 
     def remove_music(self):
