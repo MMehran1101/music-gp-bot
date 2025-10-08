@@ -8,6 +8,7 @@ from telethon import TelegramClient, events, types, functions
 from telethon.tl.custom import Button
 from telethon.tl.types import BotCommand
 
+import jdatetime
 from DataBase import DataBase
 
 # -----------------------SETTINGS-----------------------
@@ -21,9 +22,21 @@ admins = [5721277663, 1952338586]
 
 bot = TelegramClient("bot", api_id=API_ID, api_hash=API_HASH).start(bot_token=BOT_TOKEN)
 
-# Setup Database
+# -----------------------DATABASE-----------------------
 db = DataBase("music_gp.db")
 db.init_db()
+
+# -----------------------WEEK DATA-----------------------
+WEEK_ID = jdatetime.date.today().isocalendar()[1]
+WEEK_START = f"{jdatetime.date.today().year}/{jdatetime.date.today().month}/" \
+             f"{jdatetime.date.today().day}"
+
+# -----------------------TEXTS-----------------------
+TEXT_MENU = "Welcome 👋\n\nHave good day😄\n\nWhat you plan to do ?"
+TEXT_WEEK = "**Music of The Week • موسیقی هفته**" \
+            f"\n\n🔹هفته {WEEK_ID} ام سال ۱۴۰۴" \
+            f"\n🔸تاریخ شروع هفته : {WEEK_START}" \
+            "\n\n🎧#MusicOfTheWeek"
 
 
 # -----------------------EVENTS------------------------
@@ -41,23 +54,36 @@ async def new_message(event):
         )
         return
     await event.respond(
-        f"Welcome {user.first_name} 👋\n\nHave good day😄"
-        f"\n\nWhat you plan to do ?", buttons=home_menu()
+        TEXT_MENU, buttons=home_menu()
     )
+
+
+@bot.on(events.NewMessage(pattern="/active"))
+async def add_list_on_group(event: events.CallbackQuery.Event):
+    user = await event.get_sender()
+
+    if event.is_group and is_admin(user.id):
+        week_list = db.get_list_of_week(WEEK_ID)
+        await event.reply(TEXT_WEEK, buttons=build_week_button(week_list))
 
 
 @bot.on(events.CallbackQuery(pattern=b"btn_.*"))
 async def callback_handler(event: events.CallbackQuery.Event):
     data = event.data.decode().split("_")[1]
 
-    if data == "createlist":
-        pass
+    if data == "addmusic":
+        await event.edit("🔗**ثبت لینک** \n\nلطفا لینک خود را بفرستید : ", buttons=back_menu())
+
+
     elif data == "showlist":
         pass
+
     elif data == "aboutus":
         await event.answer("My name is Mehran Fallah and creator of this bot")
     elif data == "help":
         await event.answer("There is nothing to help")
+    elif data == "back":
+        await event.edit(TEXT_MENU, buttons=home_menu())
 
 
 # -----------------------FUNCTIONS---------------------
@@ -68,10 +94,23 @@ def is_admin(user_id: int) -> bool:
     return False
 
 
+def build_week_button(wlist: list):
+    btns = []
+    for l in wlist:
+        btns.append(
+            [
+                Button.url(f"{l[1]} • {l[2]} {l[4]}", l[3])
+            ]
+        )
+
+    keyboard = btns
+    return keyboard
+
+
 def home_menu():
     keyboard = [
         [
-            Button.inline("🎶 تهیه لیست موسیقی هفته 🎶", data="btn_createlist")
+            Button.inline("🎶 تهیه لیست موسیقی هفته 🎶", data="btn_addmusic")
         ],
         [
             Button.inline("🔹 نمایش لیست موسیقی هفته 🔹", data="btn_showlist")
@@ -84,11 +123,19 @@ def home_menu():
     return keyboard
 
 
+def back_menu():
+    keyboard = [
+        [Button.inline("بازگشت", data="btn_back")]
+    ]
+    return keyboard
+
+
 def show_list_menu():
     # this methode connect with db
     keyboard = [
         [Button.inline("بازگشت", data="btn_home")]
     ]
+    return keyboard
 
 
 async def setup_commands():
