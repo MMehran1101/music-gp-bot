@@ -113,8 +113,7 @@ def build_week_button(wlist: list):
             ]
         )
 
-    keyboard = btns
-    return keyboard
+    return btns
 
 
 def home_menu():
