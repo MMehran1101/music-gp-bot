@@ -38,6 +38,12 @@ TEXT_WEEK = "**Music of The Week • موسیقی هفته**" \
             f"\n🔸تاریخ شروع هفته : {WEEK_START}" \
             "\n\n🎧#MusicOfTheWeek"
 
+TOPIC_SIGN = {"Instrumental": "🎹",
+              "Persian": "🦁",
+              "Persian Rap": "🎙",
+              "Global": "🌐",
+              "Phonk": "👿"}
+
 
 # -----------------------EVENTS------------------------
 
@@ -96,10 +102,14 @@ def is_admin(user_id: int) -> bool:
 
 def build_week_button(wlist: list):
     btns = []
+    wlist.sort(key=lambda item: item[1])
+    whitespace = 3
     for l in wlist:
+        topic_text = (TOPIC_SIGN[l[1]] + l[1]) + " " * whitespace
+        name_text = " " * whitespace + l[2]
         btns.append(
             [
-                Button.url(f"{l[1]} • {l[2]} {l[4]}", l[3])
+                Button.url(f"{topic_text}•{name_text} {l[4]}", l[3])
             ]
         )
 
