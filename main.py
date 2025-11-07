@@ -158,8 +158,8 @@ async def inline_query(event: events.InlineQuery.Event):
         res = [
             builder.article(
                 title=f"🎧 {audio_info['title']}",
-                description=f"Artist : {audio_info['performer']}\n\
-                    Topic : {TOPIC_SIGN['Global']} Global",
+                description=f"Artist : {audio_info['performer']}\
+                    \nTopic : {TOPIC_SIGN['Global']} Global",
                 text=f"🎧 **{audio_info['title']}**\
                     from **Global** topic added to **Music of The Week**",
             )
@@ -171,8 +171,8 @@ async def inline_query(event: events.InlineQuery.Event):
         res = [
             builder.article(
                 title=f"🎧 {audio_info['title']}",
-                description=f"Artist : {audio_info['performer']}\n\
-                    Topic : {TOPIC_SIGN['Persian']} Persian",
+                description=f"Artist : {audio_info['performer']}\
+                    \nTopic : {TOPIC_SIGN['Persian']} Persian",
                 text=f"🎧 **{audio_info['title']}**\
                     from **Persian** topic added to **Music of The Week**",
             )
@@ -184,8 +184,8 @@ async def inline_query(event: events.InlineQuery.Event):
         res = [
             builder.article(
                 title=f"🎧 {audio_info['title']}",
-                description=f"Artist : {audio_info['performer']}\n\
-                    Topic : {TOPIC_SIGN['Persian Rap']} Persian Rap",
+                description=f"Artist : {audio_info['performer']}\
+                    \nTopic : {TOPIC_SIGN['Persian Rap']} Persian Rap",
                 text=f"🎧 **{audio_info['title']}**\
                     from **Persian Rap** topic added to **Music of The Week**",
             )
@@ -197,8 +197,8 @@ async def inline_query(event: events.InlineQuery.Event):
         res = [
             builder.article(
                 title=f"🎧 {audio_info['title']}",
-                description=f"Artist : {audio_info['performer']}\n\
-                    Topic : {TOPIC_SIGN['Phonk']} Phonk",
+                description=f"Artist : {audio_info['performer']}\
+                    \nTopic : {TOPIC_SIGN['Phonk']} Phonk",
                 text=f"🎧 **{audio_info['title']}**\
                     from **Phonk** topic added to **Music of The Week**",
             )
@@ -210,8 +210,8 @@ async def inline_query(event: events.InlineQuery.Event):
         res = [
             builder.article(
                 title=f"🎧 {audio_info['title']}",
-                description=f"Artist : {audio_info['performer']}\n\
-                    Topic : {TOPIC_SIGN['Instrumental']} Instrumental",
+                description=f"Artist : {audio_info['performer']}\
+                    \nTopic : {TOPIC_SIGN['Instrumental']} Instrumental",
                 text=f"🎧 **{audio_info['title']}**\
                     from **Instrumental** topic added to **Music of The Week**",
             )
