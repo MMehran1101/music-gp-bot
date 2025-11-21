@@ -4,6 +4,8 @@ This is main
 
 # -----------------------LIBRARIES-----------------------
 from configparser import ConfigParser
+import asyncio
+import re
 
 from telethon import TelegramClient, events, types, functions
 from telethon.tl.custom import Button
@@ -107,8 +109,25 @@ async def callback_handler(event: events.CallbackQuery.Event):
         await event.edit(TEXT_MENU, buttons=home_menu())
 
 
+@bot.on(events.NewMessage())
+async def msg_bot_handler(event):
+    if event.via_bot_id:
+        text = event.text
+        pattern = r"Name:\s*(.*)\nTopic:\s*(.*)\nLink:\s*(.*)\nalt:\s*(.*)"
+        match = re.search(pattern, text)
+
+        if match:
+            name, topic, link, alt = match.groups()
+
+        print(name + topic + link + alt)
+
+    await asyncio.sleep(3)
+    await event.delete()
+
+
 @bot.on(events.InlineQuery(pattern=r"https://t.me/Instrumental_Mosic/.*"))
 async def inline_query(event: events.InlineQuery.Event):
+    link = event.text
     builder = event.builder
     channel_username = event.text.split("/")[3]
     topic_id = event.text.split("/")[4]
@@ -168,8 +187,8 @@ async def inline_query(event: events.InlineQuery.Event):
                 title=f"🎧 {audio_info['title']}",
                 description=f"Artist : {audio_info['performer']}\
                         \nTopic : {TOPIC_SIGN[topic_name]} {topic_name}",
-                text=f"🎧 **{audio_info['title']}**\
-                        from **{topic_name}** topic added to **Music of The Week**",
+                text=f"🎧 MUSIC SELECTED : \
+                \nName: {audio_info['title']} \nTopic: {topic_name} \nLink: {link} \nalt: NONE",
             )
         ]
         await event.answer(res)
