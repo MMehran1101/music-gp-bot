@@ -53,6 +53,13 @@ TOPIC_SIGN = {
     "Phonk": "👿",
 }
 
+TOPIC_CODE = {
+    "863": "Global",
+    "864": "Persian",
+    "859": "Persian Rap",
+    "1068": "Phonk",
+    "1": "Instrumental",
+}
 # -----------------------EVENTS------------------------
 
 
@@ -153,67 +160,16 @@ async def inline_query(event: events.InlineQuery.Event):
             audio_info["performer"] = attr.performer
             audio_info["duration"] = attr.duration
 
-    if topic_id == "863":
-        # this is global
+    # Check Topic of music
+    if topic_id in list(TOPIC_CODE.keys()):
+        topic_name = TOPIC_CODE[topic_id]
         res = [
             builder.article(
                 title=f"🎧 {audio_info['title']}",
                 description=f"Artist : {audio_info['performer']}\
-                    \nTopic : {TOPIC_SIGN['Global']} Global",
+                        \nTopic : {TOPIC_SIGN[topic_name]} {topic_name}",
                 text=f"🎧 **{audio_info['title']}**\
-                    from **Global** topic added to **Music of The Week**",
-            )
-        ]
-        await event.answer(res)
-
-    elif topic_id == "864":
-        # this is persian
-        res = [
-            builder.article(
-                title=f"🎧 {audio_info['title']}",
-                description=f"Artist : {audio_info['performer']}\
-                    \nTopic : {TOPIC_SIGN['Persian']} Persian",
-                text=f"🎧 **{audio_info['title']}**\
-                    from **Persian** topic added to **Music of The Week**",
-            )
-        ]
-        await event.answer(res)
-
-    elif topic_id == "859":
-        # this is persian rap
-        res = [
-            builder.article(
-                title=f"🎧 {audio_info['title']}",
-                description=f"Artist : {audio_info['performer']}\
-                    \nTopic : {TOPIC_SIGN['Persian Rap']} Persian Rap",
-                text=f"🎧 **{audio_info['title']}**\
-                    from **Persian Rap** topic added to **Music of The Week**",
-            )
-        ]
-        await event.answer(res)
-
-    elif topic_id == "1068":
-        # this is phonk
-        res = [
-            builder.article(
-                title=f"🎧 {audio_info['title']}",
-                description=f"Artist : {audio_info['performer']}\
-                    \nTopic : {TOPIC_SIGN['Phonk']} Phonk",
-                text=f"🎧 **{audio_info['title']}**\
-                    from **Phonk** topic added to **Music of The Week**",
-            )
-        ]
-        await event.answer(res)
-
-    elif topic_id == "1":
-        # this is instrumental
-        res = [
-            builder.article(
-                title=f"🎧 {audio_info['title']}",
-                description=f"Artist : {audio_info['performer']}\
-                    \nTopic : {TOPIC_SIGN['Instrumental']} Instrumental",
-                text=f"🎧 **{audio_info['title']}**\
-                    from **Instrumental** topic added to **Music of The Week**",
+                        from **{topic_name}** topic added to **Music of The Week**",
             )
         ]
         await event.answer(res)
