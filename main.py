@@ -83,10 +83,11 @@ async def new_message(event):
 @bot.on(events.NewMessage(pattern="/active"))
 async def add_list_on_group(event: events.CallbackQuery.Event):
     user = await event.get_sender()
-
     if event.is_group and is_admin(user.id):
         week_list = db.get_list_of_week(WEEK_ID)
         await event.reply(TEXT_WEEK, buttons=build_week_button(week_list))
+
+    await event.delete()
 
 
 @bot.on(events.CallbackQuery(pattern=b"btn_.*"))
@@ -118,11 +119,10 @@ async def msg_bot_handler(event):
 
         if match:
             name, topic, link, alt = match.groups()
+            add_to_db(name, topic, link, alt)
 
-        print(name + topic + link + alt)
-
-    await asyncio.sleep(3)
-    await event.delete()
+        await asyncio.sleep(3)
+        await event.delete()
 
 
 @bot.on(events.InlineQuery(pattern=r"https://t.me/Instrumental_Mosic/.*"))
@@ -188,7 +188,7 @@ async def inline_query(event: events.InlineQuery.Event):
                 description=f"Artist : {audio_info['performer']}\
                         \nTopic : {TOPIC_SIGN[topic_name]} {topic_name}",
                 text=f"🎧 MUSIC SELECTED : \
-                \nName: {audio_info['title']} \nTopic: {topic_name} \nLink: {link} \nalt: NONE",
+                \nName: {audio_info['title']}\nTopic: {topic_name}\nLink: {link}\nalt: {None}",
             )
         ]
         await event.answer(res)
@@ -245,6 +245,12 @@ def show_list_menu():
     # this methode connect with db
     keyboard = [[Button.inline("بازگشت", data="btn_home")]]
     return keyboard
+
+
+def add_to_db(name, topic, link, alt):
+    # get weekid and plus one for next week
+    weekid = WEEK_ID + 1
+    db.add_music(name, link, topic, alt, weekid)
 
 
 async def setup_commands():
