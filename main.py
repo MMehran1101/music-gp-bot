@@ -111,7 +111,7 @@ async def add_custom_text(event:events.NewMessage.Event):
     text:str = text.split(" ")[1]
     res = add_costum_text_to_db(text, WEEK_ID)
     print(res)
-    bot_respond = await event.respond(res)
+    bot_respond = await event.reply(res)
     await asyncio.sleep(3)
     await bot_respond.delete()
     await event.delete()
