@@ -40,10 +40,12 @@ WEEK_START = (
 
 # -----------------------TEXTS-----------------------
 TEXT_MENU = "Welcome 👋\n\nHave good day😄\n\nWhat you plan to do ?"
+CUSTOM_TEXT_WEEK = db.get_custom_text(WEEK_ID)
 TEXT_WEEK = (
     "**Music of The Week • موسیقی هفته**"
     f"\n\n🔹هفته {WEEK_ID} ام سال ۱۴۰۴"
     f"\n🔸تاریخ شروع هفته : {WEEK_START}"
+    f"\n{CUSTOM_TEXT_WEEK}"
     "\n\n🎧#MusicOfTheWeek"
 )
 
@@ -64,7 +66,7 @@ TOPIC_CODE = {
 }
 # -----------------------EVENTS------------------------
 
-
+# start bot on bot chat
 @bot.on(events.NewMessage(pattern="/start"))
 async def new_message(event):
     user = await event.get_sender()
@@ -80,21 +82,41 @@ async def new_message(event):
     await event.respond(TEXT_MENU, buttons=home_menu())
 
 
-# This func add selected music by link from message on group to database
-@bot.on(events.NewMessage())
-async def selected_music_message(event):
-    if event.via_bot_id:
-        text = event.text
-        pattern = r"Name:\s*(.*)\nTopic:\s*(.*)\nLink:\s*(.*)\nalt:\s*(.*)"
-        match = re.search(pattern, text)
-
-        if match:
-            name, topic, link, alt = match.groups()
-            add_to_db(name, topic, link, alt)
-
-        await asyncio.sleep(3)
-        await event.delete()
-
+# Help to use inline queries 
+@bot.on(events.InlineQuery(pattern="^$"))
+async def help_on_inline_query(event:events.InlineQuery.Event):
+    builder = event.builder
+    options = [
+        builder.article(
+                title="⚠️THIS IS HELP dont click on options 👇",
+                text="**THIS IS HELP DON'T CLICK ON IT!**"
+            ),
+        builder.article(
+                title="📋PASTE URL🔗 (🔒ONLY ADMINS)",
+                description="Paste url you copied from topic and select your music to add on weekly music",
+                text="**THIS IS HELP DON'T CLICK ON IT!**"
+            ),
+        builder.article(
+                title="⌨️type: 'addtext'",
+                description="Type 'addtext' and type your weekly text",
+                text="**THIS IS HELP DON'T CLICK ON IT!**"
+            )
+    ]
+    
+    await event.answer(options)
+    
+@bot.on(events.NewMessage(pattern=r"/addtext .*"))
+async def add_custom_text(event:events.NewMessage.Event):
+    text = event.message.message
+    text:str = text.split(" ")[1]
+    res = add_costum_text_to_db(text, WEEK_ID)
+    print(res)
+    bot_respond = await event.respond(res)
+    await asyncio.sleep(3)
+    await bot_respond.delete()
+    await event.delete()
+    
+    
 # Check music link and send confrim message added to database
 @bot.on(events.InlineQuery(pattern=r"https://t.me/Instrumental_Mosic/.*"))
 async def check_music_by_link(event: events.InlineQuery.Event): 
@@ -177,9 +199,25 @@ async def check_music_by_link(event: events.InlineQuery.Event):
         ]
         await event.answer(res)
 
+# This func add selected music by link from message on group to database
+@bot.on(events.NewMessage(pattern=r"Name:\s*(.*)\nTopic:\s*(.*)\nLink:\s*(.*)\nalt:\s*(.*)"))
+async def selected_music_message(event):
+    if event.via_bot_id:
+        text = event.text
+        match = re.search(event.pattern, text)
+
+        if match:
+            name, topic, link, alt = match.groups()
+            add_music_to_db(name, topic, link, alt)
+
+        await asyncio.sleep(3)
+        await event.delete()
+
+
+
 # This func do send main message of weekly music
 @bot.on(events.NewMessage(pattern="/active"))
-async def add_list_on_group(event: events.CallbackQuery.Event):
+async def send_weekly_message(event: events.CallbackQuery.Event):
     user = await event.get_sender()
     if event.is_group and is_admin(user.id):
         week_list = db.get_list_of_week(WEEK_ID)
@@ -231,11 +269,15 @@ def show_list_menu():
     return keyboard
 
 
-def add_to_db(name, topic, link, alt):
+def add_music_to_db(name, topic, link, alt):
     # get weekid and plus one for next week
     weekid = WEEK_ID + 1
     db.add_music(name, link, topic, alt, weekid)
 
+def add_costum_text_to_db(text, weekid):
+    weekid = WEEK_ID + 1
+    result = db.add_custom_text(text, weekid)
+    return result
 
 async def setup_commands():
     """
