@@ -44,3 +44,26 @@ class DataBase:
 
     def remove_music(self):
         pass
+    
+    def add_custom_text(self, text, weekid):
+        print("Connecting ...")
+        with sqlite3.connect(self.path) as conn:
+            cur = conn.cursor()
+            cur.execute("""INSERT INTO custom_text (text, week_id) VALUES (?, ?)""",
+                        (text, weekid))
+            conn.commit()
+        print("Done ...")
+        return f"{text} added to {weekid}th weekly music"
+
+    def get_custom_text(self, weekid):
+        print("Connecting for getting custom text...")
+        with sqlite3.connect(self.path) as conn:
+            cur = conn.cursor()
+            cur.execute("SELECT text FROM custom_text WHERE week_id = ?",
+                        (weekid,))
+            rows = cur.fetchall()
+            texts = [row[0] for row in rows]
+            conn.commit()
+        print("Done ...")
+        return texts
+        
