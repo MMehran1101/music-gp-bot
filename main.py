@@ -80,38 +80,9 @@ async def new_message(event):
     await event.respond(TEXT_MENU, buttons=home_menu())
 
 
-@bot.on(events.NewMessage(pattern="/active"))
-async def add_list_on_group(event: events.CallbackQuery.Event):
-    user = await event.get_sender()
-    if event.is_group and is_admin(user.id):
-        week_list = db.get_list_of_week(WEEK_ID)
-        await event.reply(TEXT_WEEK, buttons=build_week_button(week_list))
-
-    await event.delete()
-
-
-@bot.on(events.CallbackQuery(pattern=b"btn_.*"))
-async def callback_handler(event: events.CallbackQuery.Event):
-    data = event.data.decode().split("_")[1]
-
-    if data == "addmusic":
-        await event.edit(
-            "🔗**ثبت لینک** \n\nلطفا لینک خود را بفرستید : ", buttons=back_menu()
-        )
-
-    elif data == "showlist":
-        pass
-
-    elif data == "aboutus":
-        await event.answer("My name is Mehran Fallah and creator of this bot")
-    elif data == "help":
-        await event.answer("There is nothing to help")
-    elif data == "back":
-        await event.edit(TEXT_MENU, buttons=home_menu())
-
-
+# This func add selected music by link from message on group to database
 @bot.on(events.NewMessage())
-async def msg_bot_handler(event):
+async def selected_music_message(event):
     if event.via_bot_id:
         text = event.text
         pattern = r"Name:\s*(.*)\nTopic:\s*(.*)\nLink:\s*(.*)\nalt:\s*(.*)"
@@ -124,9 +95,9 @@ async def msg_bot_handler(event):
         await asyncio.sleep(3)
         await event.delete()
 
-
+# Check music link and send confrim message added to database
 @bot.on(events.InlineQuery(pattern=r"https://t.me/Instrumental_Mosic/.*"))
-async def inline_query(event: events.InlineQuery.Event): 
+async def check_music_by_link(event: events.InlineQuery.Event): 
     user = await event.get_sender()
     link = event.text
     builder = event.builder
@@ -148,7 +119,7 @@ async def inline_query(event: events.InlineQuery.Event):
 
     message = await bot.get_messages(channel_username, ids=int(msg_id))
     
-    if not is_admin(user):
+    if not is_admin(user.id):
         return print("YOU ARE NOT ADMIN")
     
     if not message:
@@ -206,6 +177,15 @@ async def inline_query(event: events.InlineQuery.Event):
         ]
         await event.answer(res)
 
+# This func do send main message of weekly music
+@bot.on(events.NewMessage(pattern="/active"))
+async def add_list_on_group(event: events.CallbackQuery.Event):
+    user = await event.get_sender()
+    if event.is_group and is_admin(user.id):
+        week_list = db.get_list_of_week(WEEK_ID)
+        await event.reply(TEXT_WEEK, buttons=build_week_button(week_list))
+
+    await event.delete()
 
 # -----------------------FUNCTIONS---------------------
 
