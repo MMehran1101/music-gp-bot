@@ -126,7 +126,8 @@ async def msg_bot_handler(event):
 
 
 @bot.on(events.InlineQuery(pattern=r"https://t.me/Instrumental_Mosic/.*"))
-async def inline_query(event: events.InlineQuery.Event):
+async def inline_query(event: events.InlineQuery.Event): 
+    user = await event.get_sender()
     link = event.text
     builder = event.builder
     channel_username = event.text.split("/")[3]
@@ -146,7 +147,10 @@ async def inline_query(event: events.InlineQuery.Event):
         return
 
     message = await bot.get_messages(channel_username, ids=int(msg_id))
-
+    
+    if not is_admin(user):
+        return print("YOU ARE NOT ADMIN")
+    
     if not message:
         return {"error": "Message not found"}
 
